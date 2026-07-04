@@ -1,6 +1,10 @@
 # jugaadhub
 🚀 JugaadHub 
+
+
 DEPLOYMENT LINK-https://jugaadhub-psi.vercel.app/
+
+
 | Hyperlocal Skill ExchangeJugaadHub is a decentralized, hyper-local skill exchange ecosystem built on a "Zero Cash" model. It enables users to trade skills, services, and tasks within their immediate community using a tokenized reward system (Community Coins - CC), fostering a circular and collaborative economy.🛠 Project ArchitectureThis project uses a modular architecture to ensure scalability and ease of maintenance.Core Logic: app.js (Handles UI state and primary listings).
 
 
