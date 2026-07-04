@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jugaad Hub | Hyperlocal Skill Exchange</title>
+    <!-- Google Fonts & Leaflet CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="style.css">
+    <!-- Lucide Icons, Leaflet JS, and Chart.js -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <!-- Top Navigation Header -->
+    <header class="main-header">
+        <div class="logo" id="logo-container">Jugaad<span class="accent-violet">Hub</span></div>
+        <nav class="nav-links">
+            <button class="nav-icon-btn active" data-target="dashboard" id="nav-dashboard">
+                <i data-lucide="layout-dashboard"></i> <span>Dashboard</span>
+            </button>
+            <button class="nav-icon-btn" data-target="marketplace" id="nav-marketplace">
+                <i data-lucide="shopping-bag"></i> <span>Marketplace</span>
+            </button>
+            <button class="nav-icon-btn" data-target="analytics" id="nav-analytics">
+                <i data-lucide="bar-chart-3"></i> <span>Analytics Hub</span>
+            </button>
+            <button class="nav-icon-btn" data-target="rewards" id="nav-rewards">
+                <i data-lucide="award"></i> <span>Coins & Rewards</span>
+            </button>
+        </nav>
+        <div class="header-actions">
+            <!-- Live GPS Connector Button Node -->
+            <button id="connect-gps-btn" class="btn btn-secondary btn-small" style="border-color: var(--accent-teal); color: var(--accent-teal);">
+                <i data-lucide="map-pin"></i> <span id="text-gps-btn">Connect Live GPS</span>
+            </button>
+            
+            <div class="wallet-badge" id="wallet-display-badge">250 CC</div>
+            <select id="language-toggle" class="lang-select">
+                <option value="en">English</option>
+                <option value="hi">हिंदी</option>
+            </select>
+            <button id="theme-toggle" class="icon-btn"><i data-lucide="sun" id="theme-icon"></i></button>
+            <button class="btn btn-primary btn-small" id="open-modal-btn">
+                <i data-lucide="plus"></i> <span id="text-create-btn">Create Listing</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="content-container">
+        
+        <!-- 1. DASHBOARD VIEW (MAP + BOT PANEL GRID) -->
+        <div id="dashboard-view" class="portal-view grid-2-col">
+            <!-- Left Side: Leaflet Map Vector Container -->
+            <div class="glass-card map-outer-wrapper">
+                <div class="map-header">
+                    <h3 id="map-section-title"><i data-lucide="navigation"></i> Hyperlocal Live Skills Tracking</h3>
+                    <span class="live-pulse-badge"><span class="pulse-dot"></span> <span id="map-status-txt">Live Multi-Vector Tracking Engine Active</span></span>
+                </div>
+                <div id="map-canvas"></div>
+                <div class="map-legend">
+                    <div class="legend-item"><span class="dot tech"></span><span id="leg-tech">Tech</span></div>
+                    <div class="legend-item"><span class="dot music"></span><span id="leg-music">Music</span></div>
+                    <div class="legend-item"><span class="dot trades"></span><span id="leg-trades">Trades</span></div>
+                </div>
+            </div>
+
+            <!-- Right Side: Unified Signals + Assistant Bot Widget Panel -->
+            <div class="glass-card panel-container" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; position: relative;">
+                <!-- Live Telemetry Stream -->
+                <div style="flex: 1; overflow-y: auto; padding-bottom: 1rem;">
+                    <h3 id="signals-title" class="section-title"><i data-lucide="activity"></i> Active Local Activity Signals</h3>
+                    <div id="mini-signals-feed" class="signals-feed-wrapper"></div>
+                </div>
+
+                <!-- Integrated Inline Assistant Bot Widget (Jugaad Dost) -->
+                <div id="bot-inline-widget-wrapper" style="border-top: 1px solid var(--border-color); padding-top: 1rem; margin-top: auto;">
+                    <button id="bot-toggle-launcher" class="btn btn-secondary btn-full" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                        <i data-lucide="message-square"></i> <span id="bot-badge-txt">Help</span>
+                    </button>
+
+                    <!-- Popup Assistant Chat Matrix Box -->
+                    <div id="bot-chat-window" class="glass-card hidden" style="position: absolute; bottom: 10px; left: 10px; right: 10px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; z-index: 50; display: flex; flex-direction: column; max-height: 85%;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.03); padding: 0.75rem; border-bottom: 1px solid var(--border-color);">
+                            <div>
+                                <h4 id="bot-header-title" style="margin:0; font-size: 0.95rem;">Jugaad Dost</h4>
+                                <span id="bot-status-sub" style="font-size: 0.75rem; color: var(--accent-teal);">Online Assistant</span>
+                            </div>
+                            <button id="bot-close-btn" style="background: none; border: none; color: var(--text-muted); cursor: pointer;"><i data-lucide="x" style="width:16px; height:16px;"></i></button>
+                        </div>
+                        <div id="bot-chat-body" style="padding: 0.75rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem; max-height: 180px; font-size: 0.85rem;">
+                            <div class="bot-msg-bubble system">
+                                <p id="bot-welcome-msg" style="margin:0;">Hello user! Welcome to Jugaad Hub. How can I help you understand our features today?</p>
+                            </div>
+                        </div>
+                        <div id="bot-chat-options" style="padding: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.4rem; border-top: 1px solid var(--border-color); background: rgba(0,0,0,0.1);"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. MARKETPLACE FEED VIEW -->
+        <div id="marketplace-view" class="portal-view">
+    
+    <div class="hero-search-section">
+        <div class="search-filter-bar" style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <input type="text" id="global-search" placeholder="Search skills...">
+            <select id="occasion-filter"><option>Occasion</option></select>
+            <input type="number" id="budget-filter" placeholder="Max CC">
+            <button id="btn-chat-trigger" class="btn btn-secondary">Chat</button>
+        </div>
+    </div>
+
+    <div id="listings-feed" class="grid-3-col">
+        </div>
+
+</div>
+
+        <!-- 3. ANALYTICS HUB VIEW -->
+        <div id="analytics-view" class="portal-view hidden grid-2-col">
+            <div class="glass-card chart-container">
+                <h3 id="chart-section-title"><i data-lucide="bar-chart-3"></i> Top High-Demand Skill Ecosystem Trading Index</h3>
+                <div style="position: relative; height: 300px;"><canvas id="skillsChart"></canvas></div>
+            </div>
+            <div class="glass-card macro-data-panel">
+                <h3 id="macro-data-title"><i data-lucide="trending-up"></i> Platform Macro Turnover Data</h3>
+                <div class="metric-row">
+                    <span class="metric-value">1,482</span> <span id="lbl-metric-swaps" class="metric-lbl">Successful Local Swaps Settled</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-value">98.4%</span> <span id="lbl-metric-resolution" class="metric-lbl">Community Resolution Success Index</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-value">74,100</span> <span id="lbl-metric-coins" class="metric-lbl">CC Coins Minted over Verifications</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. REWARDS STORE VIEW -->
+        <div id="rewards-view" class="portal-view hidden">
+            <div class="glass-card wallet-hero-banner">
+                <div class="wallet-left">
+                    <h2 id="wallet-title"><i data-lucide="wallet" class="accent-teal"></i> Centralized Swap Coins Wallet</h2>
+                    <p id="wallet-desc">Earn 50 CC Coins for every completed swap and proof-of-verification file upload!</p>
+                </div>
+                <div class="wallet-right">
+                    <div class="big-balance" id="current-balance-txt">250</div>
+                    <div id="lbl-cc-coins-small" style="font-size:0.85rem; color:var(--accent-teal); font-weight:600; text-transform:uppercase; text-align:center;">CC Coins</div>
+                </div>
+            </div>
+            <h3 id="reward-shop-title" class="section-title" style="margin-top:2rem;"><i data-lucide="shopping-bag"></i> Redeem Local Partner Ecosystem Rewards</h3>
+            <div id="rewards-store-feed" class="grid-3-col"></div>
+        </div>
+
+    </main>
+
+    <!-- FLOATING LISTING MODAL INJECTOR FORM -->
+    <div id="listing-modal" class="modal-overlay hidden">
+        <div class="glass-card modal-box">
+            <div class="modal-header">
+                <h3 id="modal-heading">Broadcast New Local Offer/Request Vector</h3>
+                <button id="close-modal-btn" class="icon-btn"><i data-lucide="x"></i></button>
+            </div>
+            <form id="new-listing-form" class="modal-form">
+                <div class="input-group">
+                    <label id="lbl-form-title" for="form-title">Listing Title</label>
+                    <input type="text" id="form-title" required placeholder="e.g., Python Scripting Crash Course">
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label id="lbl-form-type" for="form-type">Type Vector</label>
+                        <select id="form-type">
+                            <option value="Offering">Offering a Skill</option>
+                            <option value="Requesting">Requesting a Skill</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label id="lbl-form-category" for="form-category">Category Node</label>
+                        <select id="form-category">
+                            <option value="Tech">Tech & Coding</option>
+                            <option value="Music">Music & Arts</option>
+                            <option value="Trades">Handyman & Trades</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label id="lbl-form-have" for="form-skill-have">Skill I Have</label>
+                        <input type="text" id="form-skill-have" required placeholder="e.g., Python, Django">
+                    </div>
+                    <div class="input-group">
+                        <label id="lbl-form-want" for="form-skill-want">Counter-Skill Demanded</label>
+                        <input type="text" id="form-skill-want" required placeholder="e.g., Household Carpentry">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label id="lbl-form-desc" for="form-desc">Operational Description</label>
+                    <textarea id="form-desc" rows="3" required placeholder="Describe what you want to teach or learn..."></textarea>
+                </div>
+                <button type="submit" id="btn-submit-form" class="btn btn-primary btn-full">Publish to Interactive Geospatial Layer</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Script connection architecture setup -->
+    <script src="bot.js"></script>
+    <script src="app.js"></script>
+    <script src="filters.js" defer></script>
+    <script src="chat.js" defer></script>
+    <script src="main.js" defer></script>
+</body>
+</html>
